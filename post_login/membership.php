@@ -51,56 +51,11 @@ if(!empty($_POST['first']) && !empty($_POST['last']) && !empty($_POST['password'
 	 
 	 
 	 
-	 } elseif ($datasource == 'FileMaker') {
-// FILEMAKER *****************************************************
-	  $cmd = $fm->newFindCommand($tUser);
-	  $cmd->addFindCriterion('email', '=="'.$email .'"');
-	  $query = $cmd->execute();
-	  
-	   if (!FileMaker::isError($query)) { 
-		  // put single found record into an array variable called $result
-		  $result = $query->getFirstRecord();
-		  $found = $query->getFoundSetCount();
-		  } 
-	 }
-	 
+	 } 
 	if($found > 0){
 		  $message = 'You have already registered. Please login.';  // because matching email was found
 		  
-/*
-For additional security INSTEAD of displaying a message to the user that tells them they've already registered, thereby telling anyone with evil intent that the email address does have an existing registration on your site, you could EMAIL a message to the email address entered into the registration form, saying "You have already registered. Please login.", and DISPLAY in the BROWSER a message that says they should "Please check your email for the next step".
-*/
 
-/*
-//*************************************************************
-// ALTERNATIVE
-// NOTE -- the code below checks for a user record with a matching email address AND password
-// This would allow multiple users to have the SAME email address and different passwords
-// Which is NOT what we want, this is just an example of how to check for both email + hashed password
-//*************************************************************
-		 if($datasource == 'FileMaker'){
-			if (password_verify($password, $result->getField('password') )) {
-			   $message = 'You have already registered. Please login.';	
-			}
-		 }
-		 
-		 if($datasource == 'MySQL'){
-			if (password_verify($password, $result['password'])) {
-			// user record found using email address only
-			// using password_verify, compare hashed plaintext password submitted at login against hashed password stored in database
-			   $message = 'You have already registered. Please login.';
-			} 
-		 }
-	   
-		// check if $message contains registered b/c there was a password match
-		if (strpos($message, 'registered') !== false) {
-		   // found a matching password
-		   } else {
-		   // did not find a matching password
-			$message .= 'Status: password does not exist.';
-		}
-//*************************************************************
-*/
    	} 
 	 
 
@@ -163,51 +118,7 @@ For additional security INSTEAD of displaying a message to the user that tells t
 		  $created = $query->rowCount();
 		
 		
-	   } elseif ($datasource == 'FileMaker') {
-  // FILEMAKER *****************************************************
-	  
-		  $newUserArray = array(
-					   'first' => $first,
-					   'last' => $last,
-					   'email' => $email,
-					   'password' => $hash,
-					   'password_plaintext' => $password,
-				   );
-		
-		  $cmd = $fm->newAddCommand($tUser,$newUserArray);
-		  $query = $cmd->execute();
-
-		  if (FileMaker::isError($query)) { 
-			  echo '<p>Error: ' . $query->getMessage() . '</p>'; 
-			  exit; 
-		  } 
-	   
-		  $newUserID = $query->getLastRecord()->getField('ID');	
-	   
-		  // find last inserted row
-		  $cmd = $fm->newFindCommand($tUser);
-		  $cmd->addFindCriterion('id', $newUserID);
-	   
-		  // Alternate way to find last inserted row
-		  // $recID =  current($query->getRecords())->getRecordID();
-		  // OR, $recID = $query->getLastRecord()->getRecordID();
-		  // $cmd = $fm->getRecordById($tUser, $recID);
-	   
-		  $query = $cmd->execute();
-
-		  if (FileMaker::isError($query)) { 
-			   echo '<p>Error: ' . $query->getMessage() . '</p>'; 
-			   exit;
-		  } 
-
-		  // put single found record into an array variable called $result
-		  $result = $query->getFirstRecord();
-		  $created = $query->getFoundSetCount();
-
-	  }
-
-  //*************************************************************
-  //*************************************************************
+	   }
 
 	  if($created == 1) {		
 		  // set session variables
@@ -218,11 +129,6 @@ For additional security INSTEAD of displaying a message to the user that tells t
 			  $last = $result['last'];
 			  $email = $result['email'];
 	
-		  } elseif ($datasource == 'FileMaker'){
-			  $userID = $result->getField('ID');
-			  $first = $result->getField('first');
-			  $last = $result->getField('last');
-			  $email = $result->getField('email');
 		  }
 	
 		  $_SESSION['is_logged_in'] = 1;
@@ -243,34 +149,7 @@ For additional security INSTEAD of displaying a message to the user that tells t
 		  // to use a html template for the email body INSTEAD of the $mailbody variable:
 		  // when sending the email via the FileMaker script use html template b/c html in $mailbody will not work
 		  $filename = 'registration_confirmation.html';
-		 	 
-		  
-		  if ($datasource == 'FileMaker') {
-// FILEMAKER *****************************************************
-// create FM account via a FileMaker script which takes a new / existing record and creates / resets their FM Security account password
-
-		 	 $subject = gSITENAME . " - Registration Confirmation";
-		 	 $sendemail = 1; 	// tells FM script to send email
-		  
-			 $layout = 'web_user';
-			 $script = 'FMAccount';
-			 
-			 if(empty($filename)){
-			 	$parameter = '$sendemail=' . $sendemail .'||$subject=' . $subject . '||$email=' . $email . '||$password=' . $password . '||$body=' . $mailbody . '||$filename=' . '||$name=' . $first . ' ' . $last;
-			 } else {
-			 	$parameter = '$sendemail=' . $sendemail .'||$subject=' . $subject . '||$email=' . $email . '||$password=' . $password . '||$filename=' . $filename . '||$body=' . '||$name=' . $first . ' ' . $last;
-			 }
-
-			 
-			 $cmd = $fm->newPerformScriptCommand($layout,$script,$parameter);
-			 $result = $cmd->execute();
-			 
-			 if (FileMaker::isError($result)) {
-			 echo 'Error creating FMAccount: '  . $result->getMessage();
-			 }
-		  }
-		  
-		  
+          
 		  // send mail
 		  $subject = gSITENAME . " - Registration Confirmation";
 		  $name = $first . ' ' . $last ;
@@ -306,7 +185,7 @@ For additional security INSTEAD of displaying a message to the user that tells t
 ?>
 
       <div class="mt-1">
-        <h1>Membership Payment</h1>
+        <h1>Membership payment</h1>
       </div>
        		<?php 
       			include(FEEDBACK);
@@ -335,7 +214,6 @@ For additional security INSTEAD of displaying a message to the user that tells t
         </div>
         
         <div class="form-group">
-        <button class="btn btn-lg btn-primary btn-block" type="submit" name="PaymentForm" value="Pay">Pay</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" name="RegistrationForm" value="Register">Plati</button>
         </div>
-        
       </form>
