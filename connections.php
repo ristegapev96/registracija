@@ -14,11 +14,11 @@ if($datasource === 'MySQL'){
 	$pwd = "at9qr8omt5gywa9z";
 	$db = "tbt869pjcepejd7e";
 	
-	//$tUser = 'user';
-	//$tReset = 'reset';
-	//$tLog = 'log';
-	//$tFile = 'file';
-    //$tUsertypes = 'usertypes';
+	$tUser = 'user';
+	$tReset = 'reset';
+	$tLog = 'log';
+	$tFile = 'file';
+    $tUsertypes = 'usertypes';
 
 
 	// for PDO connection to database
