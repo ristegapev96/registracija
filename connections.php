@@ -4,16 +4,21 @@
 
 
 if($datasource === 'MySQL'){
-	$host = "localhost";
-	$usn = "user";
-	$pwd = "a";
-	$db = "registracija";
+	//$host = "localhost";
+	//$usn = "user";
+	//$pwd = "a";
+	//$db = "registracija";
+    
+    $host = "lt80glfe2gj8p5n2.chr7pe7iynqr.eu-west-1.rds.amazonaws.com";
+	$usn = "kxc4oqxvrnj7rif2";
+	$pwd = "at9qr8omt5gywa9z";
+	$db = "tbt869pjcepejd7e";
 	
-	$tUser = 'user';
-	$tReset = 'reset';
-	$tLog = 'log';
-	$tFile = 'file';
-    $tUsertypes = 'usertypes';
+	//$tUser = 'user';
+	//$tReset = 'reset';
+	//$tLog = 'log';
+	//$tFile = 'file';
+    //$tUsertypes = 'usertypes';
 
 
 	// for PDO connection to database
